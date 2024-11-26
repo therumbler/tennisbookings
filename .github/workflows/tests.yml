@@ -7,4 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: run tests
+        env:
+          APTUS_EMAIL: ${{ secrets.APTUS_EMAIL }}
+          APTUS_PASSWORD: ${{ secrets.APTUS_PASSWORD }}
         run: make test
