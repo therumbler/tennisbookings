@@ -15,8 +15,15 @@ all: test
 
 # Target to run the tests
 .PHONY: test
-test:
-	$(TEST_CMD)
+test: test-unit test-integration
+	@echo "tests run"
+.PHONY: test-unit
+test-unit:
+	$(PYTHON) -m unittest discover -s tests/unit/
+
+.PHONY: test-integration
+test-integration:
+	$(PYTHON) -m unittest discover -s tests/integration/
 
 # Clean up any Python bytecode files (.pyc, .pyo)
 .PHONY: clean

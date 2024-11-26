@@ -1,11 +1,11 @@
 from datetime import datetime
-from unittest import TestCase
+import unittest
 
 from lib.courtreserve import _generate_time_slots, _is_booked
 from models.time_slot import TimeSlot
 
 
-class TestCourtReserve(TestCase):
+class TestCourtReserve(unittest.TestCase):
     def test_generate_time_slots(self):
         start_date = datetime.now().strftime("%Y-%m-%d")
 
@@ -16,16 +16,18 @@ class TestCourtReserve(TestCase):
     def test_booked_slot_true(self):
         booked_slots = [
             {
-                "Start": "2024-11-08T15:00:00Z",
-                "End": "2024-11-08T15:30:00Z",
+                "Start": "2024-11-08T12:00:00Z",
+                "End": "2024-11-08T13:30:00Z",
+                "CourtLabel": "Court A",
             },
             {
                 "Start": "2024-11-08T18:00:00Z",
                 "End": "2024-11-08T18:30:00Z",
+                "CourtLabel": "Court A",
             },
         ]
 
-        time_slot = TimeSlot(datetime_str="2024-11-08T15:00:00Z")
+        time_slot = TimeSlot(datetime_str="2024-11-08T12:00:00Z")
 
         assert _is_booked(time_slot, booked_slots) == True
 
@@ -43,7 +45,7 @@ class TestCourtReserve(TestCase):
 
         time_slot = TimeSlot(datetime_str="2024-11-08T15:00:00Z")
 
-        assert _is_booked(time_slot, booked_slots) == False
+        assert _is_booked(time_slot, booked_slots) is False
 
 
 def test():
@@ -51,4 +53,4 @@ def test():
 
 
 if __name__ == "__main__":
-    test()
+    unittest.main()
