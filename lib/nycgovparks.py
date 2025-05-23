@@ -86,7 +86,7 @@ def _div_to_timeslots(div):
         else:
             time_slots.append(_get_timeslot_from_row(row, date, court_name))
     time_slots = [ts for ts in time_slots if ts]
-    logger.info("found %d timeslots on %s", len(time_slots), date)
+    logger.debug("found %d timeslots on %s", len(time_slots), date)
     return time_slots
 
 
@@ -103,22 +103,23 @@ def _get_timeslots_from_html(html):
     return timeslots
 
 
-def _fetch_availability(court_id):
+def _fetch_all_courts(court_id):
     html = _fetch_html(court_id)
 
     return _get_timeslots_from_html(html)
 
 
-def fetch_courts(court_id):
-    resp = _fetch_availability(court_id)
-    return resp
+def fetch_available_courts(court_id):
+    resp = _fetch_all_courts(court_id)
+
+    return [ts for ts in resp if not ts.is_booked]
 
 
 def main():
     logging.basicConfig(level="DEBUG")
     court_id = 11  # McCarren Park
 
-    resp = fetch_courts(court_id)
+    resp = fetch_available_courts(court_id)
     # print(resp)
 
 
