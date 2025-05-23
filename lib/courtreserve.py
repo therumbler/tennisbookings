@@ -1,4 +1,5 @@
 """fetch details from courtreserve.com"""
+
 from datetime import datetime, timedelta
 import json
 import logging
@@ -87,7 +88,10 @@ def _generate_time_slots(start_date):
     # Generate the time slots
     current_time = start_time
     while current_time <= end_time:
-        time_slot = TimeSlot(datetime_str=current_time.strftime("%Y-%m-%dT%H:%M:%SZ"))
+        time_slot = TimeSlot(
+            court_name="Court 1",
+            datetime_str=current_time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        )
         time_slots.append(time_slot)
         current_time += timedelta(minutes=30)  # Increment by 30 minutes
 

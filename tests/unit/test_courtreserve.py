@@ -27,7 +27,7 @@ class TestCourtReserve(unittest.TestCase):
             },
         ]
 
-        time_slot = TimeSlot(datetime_str="2024-11-08T12:00:00Z")
+        time_slot = TimeSlot(court_name="Court 1", datetime_str="2024-11-08T12:00:00Z")
 
         assert _is_booked(time_slot, booked_slots) == True
 
@@ -43,7 +43,7 @@ class TestCourtReserve(unittest.TestCase):
             },
         ]
 
-        time_slot = TimeSlot(datetime_str="2024-11-08T15:00:00Z")
+        time_slot = TimeSlot(court_name="Court 1", datetime_str="2024-11-08T15:00:00Z")
 
         assert _is_booked(time_slot, booked_slots) is False
 
