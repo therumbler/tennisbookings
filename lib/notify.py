@@ -26,7 +26,7 @@ def send_email(
     logger.info(f"Connecting to SMTP server {smtp_server}:{smtp_port}")
     try:
         with smtplib.SMTP(smtp_server, smtp_port, timeout=TIMEOUT_SECONDS) as server:
-            server.set_debuglevel(1)  # Enable verbose debug output
+            # server.set_debuglevel(1)  # Enable verbose debug output
             logger.info("Connected to SMTP server")
             if username and password:
                 server.login(username, password)

@@ -4,7 +4,7 @@ import logging
 
 # from lib.courtreserve import fetch_courts
 from lib.nycgovparks import fetch_available_courts
-from lib.email import send_email
+from lib.notify import send_email
 
 import settings
 
