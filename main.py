@@ -37,13 +37,15 @@ def _timeslot_to_str(timeslot):
 
 def _check_timeslot_if_notified(timeslot) -> bool:
     """check if the timeslot has been notified"""
+    timeslot_string = _timeslot_to_str(timeslot)
     try:
         with open(NOTIFIED_TEXT_FILE_PATH, "r") as f:
             lines = f.readlines()
             for line in lines:
-                if _timeslot_to_str(timeslot) in line:
+                if timeslot_string in line:
                     return True
     except FileNotFoundError:
+        logger.error("filenotfound")
         pass
     return False
 
@@ -60,7 +62,7 @@ def _get_unnotified_timeslots(resp) -> List[TimeSlot]:
     for timeslot in resp:
         if not _check_timeslot_if_notified(timeslot):
             timeslots.append(timeslot)
-
+    logger.info("%d new timeslots", len(timeslots))
     return timeslots
 
 
@@ -81,10 +83,11 @@ def _notify(resp):
 
 def main():
     """let's kick it all off"""
+    logging.basicConfig(level="INFO")
     resp = fetch_all_available_courts()
     logger.info("found %d timeslots", len(resp))
     unnotified_timeslots = _get_unnotified_timeslots(resp)
-    if unnotified_timeslots:
+    if not unnotified_timeslots:
         logger.info("no new timeslots available, not notifying")
         return
     logger.info("notifying")
