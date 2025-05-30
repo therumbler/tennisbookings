@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 import logging
 
+from typing import List
+
 # from lib.courtreserve import fetch_courts
+from models.time_slot import TimeSlot
 from lib.nycgovparks import fetch_available_courts
 from lib.notify import send_email
 
@@ -52,13 +55,13 @@ def _mark_timeslot_as_notified(timeslot):
     logger.info(f"marked {timeslot.court_name} at {timeslot.datetime_str} as notified")
 
 
-def _should_notify(resp) -> bool:
-    should_notify = False
+def _get_unnotified_timeslots(resp) -> List[TimeSlot]:
+    timeslots = []
     for timeslot in resp:
         if not _check_timeslot_if_notified(timeslot):
-            should_notify = True
+            timeslots.append(timeslot)
 
-    return should_notify
+    return timeslots
 
 
 def _notify(resp):
@@ -79,14 +82,15 @@ def _notify(resp):
 def main():
     """let's kick it all off"""
     resp = fetch_all_available_courts()
-
-    if not _should_notify(resp):
+    logger.info("found %d timeslots", len(resp))
+    unnotified_timeslots = _get_unnotified_timeslots(resp)
+    if unnotified_timeslots:
         logger.info("no new timeslots available, not notifying")
         return
     logger.info("notifying")
-    if _notify(resp):
+    if _notify(unnotified_timeslots):
         logger.info("notification sent")
-        for timeslot in resp:
+        for timeslot in unnotified_timeslots:
             _mark_timeslot_as_notified(timeslot)
 
 
