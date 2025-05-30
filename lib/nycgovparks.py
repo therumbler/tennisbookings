@@ -61,7 +61,7 @@ def _time_string_to_datetime(time_string, date):
     return dt_str
 
 
-def _get_timeslot_from_row(row, date, court_name):
+def _get_timeslot_from_row(row, date, court_name, location_name):
     # logger.debug("row %s", row)
     time_string = _get_time_string_from_row(row)
     dt = _time_string_to_datetime(time_string, date)
@@ -72,10 +72,15 @@ def _get_timeslot_from_row(row, date, court_name):
     else:
         is_booked = True
 
-    return TimeSlot(datetime_str=str(dt), is_booked=is_booked, court_name=court_name)
+    return TimeSlot(
+        datetime_str=str(dt),
+        is_booked=is_booked,
+        court_name=court_name,
+        location_name=location_name,
+    )
 
 
-def _div_to_timeslots(div):
+def _div_to_timeslots(location_name, div):
     date = re.search(r"\d{4}-\d{2}-\d{2}", div).group()
     rows = _get_rows_from_div(div)
     time_slots = []
@@ -84,13 +89,17 @@ def _div_to_timeslots(div):
         if "Court" in row:
             court_name = re.search(r"Court \d", row).group()
         else:
-            time_slots.append(_get_timeslot_from_row(row, date, court_name))
+            time_slots.append(
+                _get_timeslot_from_row(row, date, court_name, location_name)
+            )
     time_slots = [ts for ts in time_slots if ts]
     logger.debug("found %d timeslots on %s", len(time_slots), date)
     return time_slots
 
 
 def _get_timeslots_from_html(html):
+    location_name = re.search(r"<h3>(.*?)</h3>", html).group(1)
+
     pattern = r'<div id="\d{4}-\d{2}-\d{2}".*?</div>'
     matches = re.findall(pattern, html, re.DOTALL)
 
@@ -98,7 +107,7 @@ def _get_timeslots_from_html(html):
         logger.error("no matches found in html")
     timeslots: list[TimeSlot] = []
     for div in matches:
-        timeslots.extend(_div_to_timeslots(div))
+        timeslots.extend(_div_to_timeslots(location_name, div))
 
     return timeslots
 

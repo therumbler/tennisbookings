@@ -19,14 +19,17 @@ def fetch_all_available_courts():
     # start_date = datetime.now().strftime("%Y-%m-%d")
 
     # court_reserve_resp = fetch_courts(org_id, start_date)
-    court_id = 11
-    nyc_gov_parks_resp = fetch_available_courts(court_id)
-    return nyc_gov_parks_resp
+    courts = []
+    court_ids = [11, 12]  # McCarren Park, Central Park
+    for court_id in court_ids:
+        courts.extend(fetch_available_courts(court_id))
+
+    return courts
 
 
 def _timeslot_to_str(timeslot):
     """convert timeslot to string"""
-    return f"{timeslot.court_name}|{timeslot.datetime_str}"
+    return f"{timeslot.location_name}|{timeslot.court_name}|{timeslot.datetime_str}"
 
 
 def _check_timeslot_if_notified(timeslot) -> bool:
