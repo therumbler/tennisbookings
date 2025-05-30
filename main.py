@@ -79,7 +79,6 @@ def _notify(resp):
 def main():
     """let's kick it all off"""
     resp = fetch_all_available_courts()
-    print(resp)
 
     if not _should_notify(resp):
         logger.info("no new timeslots available, not notifying")
