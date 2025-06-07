@@ -58,7 +58,7 @@ def _time_string_to_datetime(time_string, date):
             time_string,
             e,
         )
-    return dt_str
+    return dt
 
 
 def _get_timeslot_from_row(row, date, court_name, location_name):
@@ -74,6 +74,7 @@ def _get_timeslot_from_row(row, date, court_name, location_name):
 
     return TimeSlot(
         datetime_str=str(dt),
+        datetime_obj=dt,
         is_booked=is_booked,
         court_name=court_name,
         location_name=location_name,

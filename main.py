@@ -32,7 +32,10 @@ def fetch_all_available_courts():
 
 def _timeslot_to_str(timeslot):
     """convert timeslot to string"""
-    return f"{timeslot.location_name}|{timeslot.court_name}|{timeslot.datetime_str}"
+    # turn datetime_obj into DDD, mmm, dd, HH:MM format
+    datetime_str = timeslot.datetime_obj.strftime("%a, %b %d, %H:%M")
+
+    return f"{timeslot.location_name}|{timeslot.court_name}|{datetime_str}"
 
 
 def _check_timeslot_if_notified(timeslot) -> bool:
