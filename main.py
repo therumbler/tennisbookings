@@ -23,7 +23,7 @@ def fetch_all_available_courts():
 
     # court_reserve_resp = fetch_courts(org_id, start_date)
     courts = []
-    court_ids = [11, 12]  # McCarren Park, Central Park
+    court_ids = [2, 11, 12]  # Riverside, McCarren Park, Central Park
     for court_id in court_ids:
         courts.extend(fetch_available_courts(court_id))
 
@@ -55,9 +55,10 @@ def _check_timeslot_if_notified(timeslot) -> bool:
 
 def _mark_timeslot_as_notified(timeslot):
     """mark the timeslot as notified"""
+    timeslot_string = _timeslot_to_str(timeslot)
     with open(NOTIFIED_TEXT_FILE_PATH, "a") as f:
-        f.write(_timeslot_to_str(timeslot) + "\n")
-    logger.info(f"marked {timeslot.court_name} at {timeslot.datetime_str} as notified")
+        f.write(timeslot_string + "\n")
+    logger.info("marked %s as notified", timeslot_string)
 
 
 def _get_unnotified_timeslots(resp) -> List[TimeSlot]:
