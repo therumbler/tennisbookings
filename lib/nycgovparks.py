@@ -12,8 +12,7 @@ from models.time_slot import TimeSlot
 logger = logging.getLogger(__name__)
 
 
-def _fetch_html(court_id):
-    url = f"https://www.nycgovparks.org/tennisreservation/availability/{court_id}"
+def _fetch_html(url):
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
         "accept": "text/html",
@@ -61,7 +60,7 @@ def _time_string_to_datetime(time_string, date):
     return dt
 
 
-def _get_timeslot_from_row(row, date, court_name, location_name):
+def _get_timeslot_from_row(row, date, court_name, location_name, booking_url):
     # logger.debug("row %s", row)
     time_string = _get_time_string_from_row(row)
     dt = _time_string_to_datetime(time_string, date)
@@ -78,10 +77,11 @@ def _get_timeslot_from_row(row, date, court_name, location_name):
         is_booked=is_booked,
         court_name=court_name,
         location_name=location_name,
+        booking_url=booking_url,
     )
 
 
-def _div_to_timeslots(location_name, div):
+def _div_to_timeslots(location_name, div, booking_url):
     date = re.search(r"\d{4}-\d{2}-\d{2}", div).group()
     rows = _get_rows_from_div(div)
     time_slots = []
@@ -91,14 +91,16 @@ def _div_to_timeslots(location_name, div):
             court_name = re.search(r"Court \d", row).group()
         else:
             time_slots.append(
-                _get_timeslot_from_row(row, date, court_name, location_name)
+                _get_timeslot_from_row(
+                    row, date, court_name, location_name, booking_url
+                )
             )
     time_slots = [ts for ts in time_slots if ts]
     logger.debug("found %d timeslots on %s", len(time_slots), date)
     return time_slots
 
 
-def _get_timeslots_from_html(html):
+def _get_timeslots_from_html(html, booking_url):
     location_name = re.search(r"<h3>(.*?)</h3>", html).group(1)
 
     pattern = r'<div id="\d{4}-\d{2}-\d{2}".*?</div>'
@@ -108,15 +110,16 @@ def _get_timeslots_from_html(html):
         logger.error("no matches found in html")
     timeslots: list[TimeSlot] = []
     for div in matches:
-        timeslots.extend(_div_to_timeslots(location_name, div))
+        timeslots.extend(_div_to_timeslots(location_name, div, booking_url))
 
     return timeslots
 
 
 def _fetch_all_courts(court_id):
-    html = _fetch_html(court_id)
+    url = f"https://www.nycgovparks.org/tennisreservation/availability/{court_id}"
+    html = _fetch_html(url)
 
-    return _get_timeslots_from_html(html)
+    return _get_timeslots_from_html(html, booking_url=url)
 
 
 def fetch_available_courts(court_id):

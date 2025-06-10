@@ -70,9 +70,25 @@ def _get_unnotified_timeslots(resp) -> List[TimeSlot]:
     return timeslots
 
 
-def _notify(resp):
+def _create_email_body(timeslots: List[TimeSlot]) -> str:
+    """Create an email body from a list of timeslots."""
     body = "The following courts are available:\n"
-    body += "\n".join([_timeslot_to_str(timeslot) for timeslot in resp])
+    last_booking_url = ""
+    for timeslot in timeslots:
+        datetime_str = timeslot.datetime_obj.strftime("%a, %b %d, %H:%M")
+        if timeslot.booking_url != last_booking_url:
+            body += f"\n\n\n{timeslot.location_name}: {timeslot.booking_url}\n"
+            last_booking_url = timeslot.booking_url
+        body += f"{timeslot.court_name} | {datetime_str}\n"
+
+    return body
+
+
+def _notify(resp):
+    body = _create_email_body(resp)
+    logger.info("email body:\n%s", body)
+    logger.warning("skipping notify")
+    return
     return send_email(
         subject="NYC Parks Tennis Court Availability",
         body=body,

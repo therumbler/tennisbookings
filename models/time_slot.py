@@ -8,6 +8,7 @@ class TimeSlot:
     court_name: str
     datetime_str: str
     datetime_obj: datetime
+    booking_url: str
     is_booked: bool = False
 
     def asdict(self):
