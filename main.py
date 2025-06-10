@@ -23,7 +23,7 @@ def fetch_all_available_courts():
 
     # court_reserve_resp = fetch_courts(org_id, start_date)
     courts = []
-    court_ids = [2, 11, 12]  # Riverside, McCarren Park, Central Park
+    court_ids = [3, 11, 12]  # Riverside, McCarren Park, Central Park
     for court_id in court_ids:
         courts.extend(fetch_available_courts(court_id))
 
