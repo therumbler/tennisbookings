@@ -87,8 +87,6 @@ def _create_email_body(timeslots: List[TimeSlot]) -> str:
 def _notify(resp):
     body = _create_email_body(resp)
     logger.info("email body:\n%s", body)
-    logger.warning("skipping notify")
-    return
     return send_email(
         subject="NYC Parks Tennis Court Availability",
         body=body,
