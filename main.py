@@ -81,6 +81,7 @@ def _create_email_body(timeslots: List[TimeSlot]) -> str:
             last_booking_url = timeslot.booking_url
         body += f"{timeslot.court_name} | {datetime_str}\n"
 
+    body += '\n'
     return body
 
 
