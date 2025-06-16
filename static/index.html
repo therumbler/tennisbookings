@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tennis Court Timeslots</title>
+    
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Alpine.js CDN -->
@@ -46,120 +47,41 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <template x-for="timeslot in locationTimeslots" :key="timeslot.datetime_str + '-' + timeslot.court_name">
                             <div class="bg-white rounded-lg shadow-md p-5 border border-gray-100 flex flex-col justify-between">
-                                <div>
-                                    <p class="text-lg font-medium text-gray-900 mb-2">
-                                        <span class="font-bold" x-text="timeslot.court_name"></span>
-                                    </p>
-                                    <p class="text-gray-600 mb-2">
-                                        <span class="font-semibold">Time:</span>
-                                        <span x-text="formatDateTime(timeslot.datetime_str)"></span>
-                                    </p>
-                                    <p class="text-gray-600 mb-4">
-                                        <span class="font-semibold">Status:</span>
-                                        <span :class="timeslot.is_booked ? 'text-red-500 font-bold' : 'text-green-600 font-bold'" x-text="timeslot.is_booked ? 'Booked' : 'Available'"></span>
-                                    </p>
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                                    <span>
+                                        <p class="text-lg font-medium text-gray-900 mb-2">
+                                            <span x-text="formatDateTime(timeslot.datetime_str)"></span>
+                                        </p>
+                                        <p class="text-gray-600 mb-2">
+                                            <span class="font-bold" x-text="timeslot.court_name"></span>
+                                        </p>
+                                        <p class="text-gray-600 mb-4 sm:mb-0">
+                                            <span class="font-semibold">Status:</span>
+                                            <span :class="timeslot.is_booked ? 'text-red-500 font-bold' : 'text-green-600 font-bold'" x-text="timeslot.is_booked ? 'Booked' : 'Available'"></span>
+                                        </p>
+                                    </span>
+                                    <span class="mt-4 sm:mt-0 sm:ml-4 text-right">
+                                        <a :href="timeslot.booking_url" target="_blank" rel="noopener noreferrer"
+                                           :class="{
+                                               'inline-block px-6 py-3 rounded-md text-white font-semibold transition-colors duration-200 shadow-lg transform hover:scale-105': true,
+                                               'bg-indigo-600 hover:bg-indigo-700': !timeslot.is_booked,
+                                               'bg-gray-400 cursor-not-allowed': timeslot.is_booked
+                                           }"
+                                           x-text="timeslot.is_booked ? 'View Details' : 'Book Now'"
+                                           :aria-disabled="timeslot.is_booked"
+                                           :tabindex="timeslot.is_booked ? -1 : 0"
+                                           :onclick="timeslot.is_booked ? 'event.preventDefault()' : ''"
+                                        ></a>
+                                    </span>
                                 </div>
-                                <div class="mt-4 text-right">
-                                    <a :href="timeslot.booking_url" target="_blank" rel="noopener noreferrer"
-                                       :class="{
-                                           'inline-block px-6 py-3 rounded-md text-white font-semibold transition-colors duration-200 shadow-lg transform hover:scale-105': true,
-                                           'bg-indigo-600 hover:bg-indigo-700': !timeslot.is_booked,
-                                           'bg-gray-400 cursor-not-allowed': timeslot.is_booked
-                                       }"
-                                       x-text="timeslot.is_booked ? 'View Details' : 'Book Now'"
-                                       :aria-disabled="timeslot.is_booked"
-                                       :tabindex="timeslot.is_booked ? -1 : 0"
-                                       :onclick="timeslot.is_booked ? 'event.preventDefault()' : ''"
-                                    ></a>
-                                </div>
-                            </div>
                         </template>
                     </div>
                 </div>
             </template>
         </div>
     </div>
+    <!-- App code-->
+    <script src="js/timeslotsApp.js"></script>
 
-    <script>
-        function tennisTimeslots() {
-            return {
-                timeslots: [],
-                loading: true,
-                error: null,
-
-                // Computed property to group timeslots by location
-                get groupedTimeslots() {
-                    const grouped = {};
-                    this.timeslots.forEach(timeslot => {
-                        if (!grouped[timeslot.location_name]) {
-                            grouped[timeslot.location_name] = [];
-                        }
-                        grouped[timeslot.location_name].push(timeslot);
-                    });
-                    // Sort locations alphabetically
-                    const sortedLocations = Object.keys(grouped).sort();
-                    const sortedGrouped = {};
-                    sortedLocations.forEach(loc => {
-                        // Sort timeslots within each location by datetime
-                        grouped[loc].sort((a, b) => new Date(a.datetime_str) - new Date(b.datetime_str));
-                        sortedGrouped[loc] = grouped[loc];
-                    });
-                    return sortedGrouped;
-                },
-
-                // Function to fetch timeslots from the API
-                async fetchTimeslots() {
-                    this.loading = true;
-                    this.error = null;
-                    try {
-                        const response = await fetch('/api/timeslots');
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        const data = await response.json();
-                        // Basic validation of the incoming data structure
-                        if (Array.isArray(data) && data.every(item =>
-                            typeof item.booking_url === 'string' &&
-                            typeof item.court_name === 'string' &&
-                            typeof item.datetime_obj === 'string' &&
-                            typeof item.datetime_str === 'string' &&
-                            typeof item.is_booked === 'boolean' &&
-                            typeof item.location_name === 'string'
-                        )) {
-                            this.timeslots = data;
-                        } else {
-                            throw new Error('Received data is not in the expected format.');
-                        }
-                    } catch (e) {
-                        console.error('Failed to fetch timeslots:', e);
-                        this.error = 'Failed to load timeslots. Please try again later.';
-                    } finally {
-                        this.loading = false;
-                    }
-                },
-
-                // Function to format the datetime string for display
-                formatDateTime(datetime_str) {
-                    try {
-                        const date = new Date(datetime_str);
-                        // Options for date and time formatting
-                        const options = {
-                            weekday: 'short', // Mon, Tue, etc.
-                            month: 'short',   // Jan, Feb, etc.
-                            day: 'numeric',   // 1, 2, etc.
-                            year: 'numeric',  // 2023, 2024, etc.
-                            hour: 'numeric',  // 1, 2, etc.
-                            minute: '2-digit',// 00, 30, etc.
-                            hour12: true      // AM/PM
-                        };
-                        return date.toLocaleString('en-US', options);
-                    } catch (e) {
-                        console.error('Error formatting date:', e);
-                        return datetime_str; // Return original if formatting fails
-                    }
-                }
-            }
-        }
-    </script>
 </body>
 </html>
