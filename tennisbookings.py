@@ -101,9 +101,9 @@ def _notify(resp):
 
 def fetch_courts_and_notify():
     """let's kick it all off"""
-    resp = fetch_all_available_courts()
-    logger.info("found %d timeslots", len(resp))
-    unnotified_timeslots = _get_unnotified_timeslots(resp)
+    all_timeslots = fetch_all_available_courts()
+    logger.info("found %d timeslots", len(all_timeslots))
+    unnotified_timeslots = _get_unnotified_timeslots(all_timeslots)
     if not unnotified_timeslots:
         logger.info("no new timeslots available, not notifying")
         return
