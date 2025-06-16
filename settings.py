@@ -1,6 +1,9 @@
 import os
 
 
+LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
+
+
 APP_MODE = os.environ.get("APP_MODE", "notify")
 if APP_MODE in ["notify"]:
     SMTP_SERVER = os.environ["SMTP_SERVER"]
