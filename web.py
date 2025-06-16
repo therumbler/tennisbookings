@@ -17,4 +17,8 @@ def make_app():
     def timeslots():
         return fetch_all_available_courts()
 
+    @app.route("/<path:path>")
+    def static_files(path):
+        return app.send_static_file(path)
+
     return app
