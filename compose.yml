@@ -1,0 +1,8 @@
+---
+services:
+  web:
+    build: .
+    ports:
+      - "5023:5023"
+    environment:
+      - APP_MODE=web
