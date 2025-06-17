@@ -1,0 +1,7 @@
+name = "tennisbookings-worker"
+main = "worker.py"
+compatibility_flags = ["python_workers"]
+compatibility_date = "2024-03-20"
+
+[vars]
+APP_MODE = "web"

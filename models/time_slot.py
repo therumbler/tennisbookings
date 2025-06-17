@@ -12,4 +12,7 @@ class TimeSlot:
     is_booked: bool = False
 
     def asdict(self):
-        return asdict(self)
+        resp = asdict(self)
+        # Remove datetime_obj from the dict
+        resp.pop("datetime_obj", None)
+        return resp
