@@ -1,7 +1,7 @@
 import logging
 from flask import Flask
 
-from tennisbookings import fetch_all_available_courts
+from tennisbookings import fetch_all_available_courts_threads
 from settings import LOG_LEVEL
 
 
@@ -15,7 +15,7 @@ def make_app():
 
     @app.route("/api/timeslots")
     def timeslots():
-        return fetch_all_available_courts()
+        return fetch_all_available_courts_threads()
 
     @app.route("/<path:path>")
     def static_files(path):

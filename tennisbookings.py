@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
+from concurrent.futures import ThreadPoolExecutor
 import logging
-
 from typing import List
 
 from models.time_slot import TimeSlot
@@ -12,6 +12,19 @@ import settings
 logger = logging.getLogger(__name__)
 
 NOTIFIED_TEXT_FILE_PATH = "notified.txt"
+COURT_IDS = [3, 11, 12, 13]  # Riverside, McCarren Park, Central Park, Sutton East
+
+
+def fetch_all_available_courts_threads():
+    with ThreadPoolExecutor() as executor:
+        logger.info("using %d workers to fetch courts", executor._max_workers)
+        courts = list(executor.map(fetch_available_courts, COURT_IDS))
+
+    # Flatten the list of lists
+    all_courts = []
+    for court_list in courts:
+        all_courts.extend(court_list)
+    return all_courts
 
 
 def fetch_all_available_courts():
@@ -21,8 +34,7 @@ def fetch_all_available_courts():
 
     # court_reserve_resp = fetch_courts(org_id, start_date)
     courts = []
-    court_ids = [3, 11, 12, 13]  # Riverside, McCarren Park, Central Park, Sutton East
-    for court_id in court_ids:
+    for court_id in COURT_IDS:
         courts.extend(fetch_available_courts(court_id))
 
     return courts
@@ -100,7 +112,7 @@ def _notify(resp):
 
 def fetch_courts_and_notify():
     """let's kick it all off"""
-    all_timeslots = fetch_all_available_courts()
+    all_timeslots = fetch_all_available_courts_threads()
     logger.info("found %d timeslots", len(all_timeslots))
     unnotified_timeslots = _get_unnotified_timeslots(all_timeslots)
     if not unnotified_timeslots:
