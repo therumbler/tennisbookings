@@ -8,20 +8,21 @@ function tennisTimeslots() {
     get groupedTimeslots() {
       const grouped = {};
       this.timeslots.forEach((timeslot) => {
-        if (!grouped[timeslot.location_name]) {
-          grouped[timeslot.location_name] = [];
+        let yyyymmdd = timeslot.datetime_str.slice(0, 10);
+        if (!grouped[yyyymmdd]) {
+          grouped[yyyymmdd] = [];
         }
-        grouped[timeslot.location_name].push(timeslot);
+        grouped[yyyymmdd].push(timeslot);
       });
       // Sort locations alphabetically
-      const sortedLocations = Object.keys(grouped).sort();
+      const sortedGroups = Object.keys(grouped).sort();
       const sortedGrouped = {};
-      sortedLocations.forEach((loc) => {
+      sortedGroups.forEach((key) => {
         // Sort timeslots within each location by datetime
-        grouped[loc].sort(
+        grouped[key].sort(
           (a, b) => new Date(a.datetime_str) - new Date(b.datetime_str)
         );
-        sortedGrouped[loc] = grouped[loc];
+        sortedGrouped[key] = grouped[key];
       });
       return sortedGrouped;
     },
@@ -61,6 +62,26 @@ function tennisTimeslots() {
       }
     },
 
+    formatDateTimeToMonthDay(datetime_str) {
+      try {
+        // add tz to datetime_str if not present
+        if (!datetime_str.includes("T")) {
+          datetime_str += "T04:00:00Z"; // Default time if not provided
+        }
+        const date = new Date(datetime_str);
+        // Options for date formatting
+        const options = {
+          weekday: "short", // Mon, Tue, etc.
+          month: "short", // Jan, Feb, etc.
+          day: "numeric", // 1, 2, etc.
+        };
+        return date.toLocaleDateString("en-US", options);
+      } catch (e) {
+        console.error("Error formatting date:", e);
+        return datetime_str; // Return original if formatting fails
+      }
+    },
+
     // Function to format the datetime string for display
     formatDateTime(datetime_str) {
       try {
@@ -68,10 +89,6 @@ function tennisTimeslots() {
         // Options for date and time formatting
 
         const options = {
-          weekday: "short", // Mon, Tue, etc.
-          month: "short", // Jan, Feb, etc.
-          day: "numeric", // 1, 2, etc.
-          year: "numeric", // 2023, 2024, etc.
           hour: "numeric", // 1, 2, etc.
           minute: "2-digit", // 00, 30, etc.
           hour12: true, // AM/PM

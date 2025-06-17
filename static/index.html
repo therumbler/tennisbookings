@@ -47,11 +47,11 @@
 
         <!-- Timeslots Display -->
         <div x-show="!loading && Object.keys(groupedTimeslots).length > 0">
-            <template x-for="(locationTimeslots, locationName) in groupedTimeslots" :key="locationName">
+            <template x-for="(locationTimeslots, group) in groupedTimeslots" :key="group">
                 <div class="mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <h2 class="text-2xl sm:text-3xl font-semibold text-gray-700 mb-6 pb-2 border-b-2 border-gray-300" x-text="locationName"></h2>
+                    <h2 class="text-2xl sm:text-3xl font-semibold text-gray-700 mb-6 pb-2 border-b-2 border-gray-300" x-text="formatDateTimeToMonthDay(group)"></h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <template x-for="timeslot in locationTimeslots" :key="timeslot.datetime_str + '-' + timeslot.court_name">
+                        <template x-for="timeslot in locationTimeslots" :key="timeslot.key">
                             <div class="bg-white rounded-lg shadow-md p-5 border border-gray-100 flex flex-col justify-between">
                                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                                     <span>
@@ -59,7 +59,7 @@
                                             <span x-text="formatDateTime(timeslot.datetime_str)"></span>
                                         </p>
                                         <p class="text-gray-600 mb-2">
-                                            <span class="font-bold" x-text="timeslot.court_name"></span>
+                                            <span class="font-bold" x-text="timeslot.location_name + ' | ' +  timeslot.court_name"></span>
                                         </p>
                                         <p class="text-gray-600 mb-4 sm:mb-0">
                                             <span class="font-semibold">Status:</span>
@@ -73,7 +73,7 @@
                                                'bg-indigo-600 hover:bg-indigo-700': !timeslot.is_booked,
                                                'bg-gray-400 cursor-not-allowed': timeslot.is_booked
                                            }"
-                                           x-text="timeslot.is_booked ? 'View Details' : 'Book Now'"
+                                           x-text="timeslot.is_booked ? 'View Details' : 'Book'"
                                            :aria-disabled="timeslot.is_booked"
                                            :tabindex="timeslot.is_booked ? -1 : 0"
                                            :onclick="timeslot.is_booked ? 'event.preventDefault()' : ''"
