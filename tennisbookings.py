@@ -16,7 +16,6 @@ NOTIFIED_TEXT_FILE_PATH = "notified.txt"
 
 def fetch_all_available_courts():
     """fetch courts from all systems"""
-    logging.basicConfig(level="INFO")
     # org_id = 10243  # McCarren Park
     # start_date = datetime.now().strftime("%Y-%m-%d")
 
