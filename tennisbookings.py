@@ -32,15 +32,15 @@ def fetch_all_available_courts_threads():
 def _court_to_ics_event(court: TimeSlot) -> str:
     dt_start = court.datetime_obj
     dtstamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    dtstart = dt_start.strftime("%Y%m%dT%H%M%S-0400")
+    dtstart = dt_start.strftime("%Y%m%dT%H%M%S")
 
-    dtend = (dt_start + timedelta(hours=1)).strftime("%Y%m%dT%H%M%S-0400")
+    dtend = (dt_start + timedelta(hours=1)).strftime("%Y%m%dT%H%M%S")
     ics = [
         "BEGIN:VEVENT",
         f"UID:{court.key}",
         f"DTSTAMP:{dtstamp}",
-        f"DTSTART:{dtstart}",
-        f"DTEND:{dtend}",
+        f"DTSTART;TZID=America/New_York:{dtstart}",
+        f"DTEND;TZID=America/New_York:{dtend}",
         f"SUMMARY:{court.location_name} - {court.court_name}",
         f"DESCRIPTION:Available slot on {court.court_name} at {court.datetime_str}",
         f"LOCATION:{court.location_name}",
