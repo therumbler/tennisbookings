@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
+from datetime import timezone, timedelta
 import logging
 from typing import List
 
@@ -25,6 +27,43 @@ def fetch_all_available_courts_threads():
     for court_list in courts:
         all_courts.extend(court_list)
     return all_courts
+
+
+def _court_to_ics_event(court: TimeSlot) -> str:
+    dt_start = court.datetime_obj
+    dtstamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    dtstart = dt_start.strftime("%Y%m%dT%H%M%S-0400")
+
+    dtend = (dt_start + timedelta(hours=1)).strftime("%Y%m%dT%H%M%S-0400")
+    ics = [
+        "BEGIN:VEVENT",
+        f"UID:{court.key}",
+        f"DTSTAMP:{dtstamp}",
+        f"DTSTART:{dtstart}",
+        f"DTEND:{dtend}",
+        f"SUMMARY:{court.location_name} - {court.court_name}",
+        f"DESCRIPTION:Available slot on {court.court_name} at {court.datetime_str}",
+        f"LOCATION:{court.location_name}",
+        "END:VEVENT",
+    ]
+    return "\r\n".join(ics)
+
+
+def fetch_calendar_string() -> str:
+    """Create a .ics calendar string of all available courts"""
+    courts = fetch_all_available_courts_threads()
+    ics = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//tennis.rumble.nyc//Tennis//EN",
+        "CALSCALE:GREGORIAN",
+    ]
+
+    for court in courts:
+        ics.append(_court_to_ics_event(court))
+
+    ics.append("END:VCALENDAR")
+    return "\r\n".join(ics)
 
 
 def fetch_all_available_courts():
