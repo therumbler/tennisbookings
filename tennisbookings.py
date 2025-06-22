@@ -55,6 +55,7 @@ def fetch_calendar_string() -> str:
     ics = [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",
+        "X-WR-CALNAME:NYC Tennis Availability",
         "PRODID:-//tennis.rumble.nyc//Tennis//EN",
         "CALSCALE:GREGORIAN",
     ]
